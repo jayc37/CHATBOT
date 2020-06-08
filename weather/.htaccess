@@ -1,0 +1,38 @@
+<IfModule mod_rewrite.c>
+    # Make sure directory listing is disabled
+    Options +FollowSymLinks -Indexes
+    # disable the Apache MultiViews directive if it is enabled on the server. It plays havoc with URL rewriting
+    Options -MultiViews
+    
+    RewriteEngine On
+    
+    #Option 1: To rewrite "www.domain.com -> domain.com" uncomment the following lines.
+    #RewriteCond %{HTTPS} !=on
+    #RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    #RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+    #Option 2: To rewrite "domain.com -> www.domain.com" uncomment the following lines.
+    #RewriteCond %{HTTPS} !=on
+    #RewriteCond %{HTTP_HOST} !^www\..+$ [NC]
+    #RewriteCond %{HTTP_HOST} (.+)$ [NC]
+    #RewriteRule ^(.*)$ http://www.%1/$1 [R=301,L]
+    
+    #Option 3: Hot link protect
+    #RewriteCond %{HTTP_REFERER} !^$ [NC]
+    #RewriteCond %{HTTP_REFERER} !^http://domain.com [NC]
+    #RewriteCond %{HTTP_REFERER} !^http://www.domain.com [NC]
+    #RewriteRule ^.*$ http://domain.com [R,L]
+
+    #Remove index.php
+    <IfModule mod_php5.c>
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ index.php/$1 [L]
+    </IfModule>
+
+    <IfModule !mod_php5.c>
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ index.php?/$1 [L]
+    </IfModule>
+</IfModule>  
